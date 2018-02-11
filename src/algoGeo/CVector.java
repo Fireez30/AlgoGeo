@@ -16,4 +16,16 @@ public class CVector {
 			y=p2;
 		}
 		
+		public CVector(CPoint p1,CPoint p2) {
+			this.x = p2.getX()-p1.getX();
+			this.y = p2.getY()-p1.getY();
+		}
+		
+		public double getX() {
+			return this.x;
+		}
+		
+		public double getY() {
+			return this.y;
+		}
 }

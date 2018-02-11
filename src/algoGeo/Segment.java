@@ -4,19 +4,24 @@ import java.util.ArrayList;
 
 public class Segment {
 
-	double xa,xb,ya,yb;
+	CPoint x,y;
 
-	public double det(double xa, double ya, double xb, double yb, double xc, double yc)
+	public Segment(CPoint p1,CPoint p2) {
+		this.x=p1;
+		this.y=p2;
+	}
+	
+	public double det(CVector v1, CVector v2)
 	{
-		CVector v1 = new CVector(xb-xa,yb-ya);
-		CVector v2 = new CVector(xc-xa,yc-ya);
-
-		return v1.x*v2.y-v1.y*v2.x;
+		return v1.getX()*v2.getY()-v1.getY()*v2.getX();
 	}
 
-	public double tour(double vx,double vy,double wx, double wy,double px,double py)
+	public double tour(CPoint p1, CPoint p2,CPoint p3)
 	{
-		double d = det(vx,vy,wx,wy,px,py);
+		CVector v1 = new CVector(p1,p2);
+		CVector v2 = new CVector(p1,p3);
+		
+		double d = det(v1,v2);
 		if (d>0)
 			return 1;
 		else if (d==0)
@@ -24,29 +29,41 @@ public class Segment {
 		else return 1;
 	}
 	
-	public boolean testIntersection(double px, double py, double qx, double qy){
-		double d1=tour(xa,ya,xb,yb,px,py);
-		double d2=tour(xa,ya,xb,yb,qx,qy);
+	public boolean testIntersection(CPoint p1, CPoint p2){
+		
+		double d1=tour(this.x,this.y,p1);
+		double d2=tour(this.x,this.y,p2);
 		
 		if (d1*d2 > 0)
 			return false;
 		if (d1*d2 < 0)
 		{
-			double d3 = tour(px,py,qx,qy,xa,ya);
-			double d4 = d3 = tour(px,py,qx,qy,xb,yb);
+			double d3 = tour(p1,p2,this.x);
+			double d4 = d3 = tour(p1,p2,this.y);
 			
 			if (d3*d4 > 0)
 				return false;
 			
 			if (d3*d4 < 0)
-				return (contains())
+				return true;
 						
 		}
+		Segment CD = new Segment(p1,p2);
+		
+		return (CD.contains(this.x) || CD.contains(this.y) || this.contains(p1) || this.contains(p2));//contains
 	}
 	
-	public boolean contains(double px, double py){
-			if (xa==xb && ya==yb)
-				return xa==px && ya==py;
+	public boolean appartient01(double d1) {
+		return (d1 >= 0 && d1 <= 1);
 	}
+	
+	public boolean contains(CPoint p1){
+			if (this.x.getX()==this.y.getX() && this.x.getY()==this.y.getY())
+				return (this.x.getX()==p1.getX() && this.x.getY()==p1.getY());
+			if (this.x.getX()==p1.getX())
+				return  (p1.getX()==this.x.getX() && appartient01((p1.getY()-this.y.getY())/(this.x.getY()-this.y.getY())));
+			if (this.y.getY()==this.x.getY())
+				return (p1.getY()==this.x.getY() && appartient01((p1.getX()-this.y.getX())/(this.x.getX()-this.y.getX())));
+			return ((p1.getX()-this.y.getX())/(this.x.getX()-this.y.getX()) == (p1.getY()-this.y.getY())/(this.x.getY()-this.y.getY())) && appartient01((p1.getX()-this.y.getX())/(this.x.getX()-this.y.getX()));
 	}
 }

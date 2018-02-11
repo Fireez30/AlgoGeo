@@ -1,0 +1,10 @@
+21;26;Point 0
+135;118;Point 1
+174;19;Point 2
+241;170;Point 3
+72;142;Point 4
+106;3;Point 5
+225;37;Point 6
+184;130;Point 7
+40;73;Point 8
+219;115;Point 9
