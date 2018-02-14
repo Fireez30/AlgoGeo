@@ -1,6 +1,11 @@
 package main;
 import javax.swing.JFrame;
+
+import algoGeo.CPoint;
+import algoGeo.CVector;
 import utils.affichage.Vue;
+import utils.vecteur.PointVisible;
+import utils.vecteur.Vecteur;
 
 public class Main {
 	
@@ -12,4 +17,6 @@ public class Main {
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
+	
+		
 }

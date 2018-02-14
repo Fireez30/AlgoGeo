@@ -1,0 +1,23 @@
+GALLEAN Benjamin
+
+
+
+Exercices rendus : Exercice 5 (et donc exercice 4)
+
+Avant de réaliser l'exercice 4 et 5 j'ai fais le 1 et 2 (qui étaient nécessaire)
+
+Voici l'ensemble des points qu m'ont posé un soucis pour ces exercices :
+
+-> Pour l'exercice 1, j'avais fais une erreur dans la génération des points sur un disque, cela formait un carré.
+J'ai donc utilisé la formule permettant de générer les points sur le cercle et je vérifie que la norme² entre le centre et ce point est < au rayon²
+
+-> Je n'ai pas eu de problèmes pour l'exercice 2.
+
+-> Je n'avais pas géré le cas ou les points étaient alignés pour le calcul des tours entre les 3 points et j'avais une erreur.
+
+-> L'erreur précédente se répercutait ainsi sur getNext et donc la fonction Jarvis, et le while bouclait indéfiniment. J'ai d'abord cru que c'était un soucis dans la fenêtre qui affiche les points et pas dans la fonction de calcul de 
+l'enveloppe.
+
+Une autre difficulté a été de comprendre le fonctionnement des MouseEvent et de l'affichage correct des vecteurs.
+
+

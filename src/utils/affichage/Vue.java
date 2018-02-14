@@ -1,12 +1,11 @@
 package utils.affichage;
 import javax.swing.*;
 
-import algoGeo.CPoint;
-import algoGeo.CVector;
 import utils.couleurs.Couleur;
 import utils.fileIo.ReadWritePoint;
 
 import utils.vecteur.PointVisible;
+import utils.vecteur.Vecteur;
 
 import java.awt.*;
 
@@ -21,13 +20,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Vue extends JPanel implements MouseWheelListener, MouseListener, ActionListener{
-	Color bgColor = Couleur.bg; // la couleur de fond de la fenêtre
+	Color bgColor = Couleur.bg; // la couleur de fond de la fenï¿½tre
 	Color fgColor = Couleur.fg; // la couleur des lignes
 	int width;
+	int centre = 400;
 	ArrayList<PointVisible> points = new ArrayList<PointVisible>();
+	ArrayList<PointVisible> envellope = new ArrayList<PointVisible>();
 
 	// n : le nombre de lignes
-	// width, height : largeur, hauteur de la fenêtre
+	// width, height : largeur, hauteur de la fenï¿½tre
 	public Vue(int n, int width,int rayon) {
 		super();
 		JButton b1 = new JButton("Enregistrer");
@@ -46,46 +47,139 @@ public class Vue extends JPanel implements MouseWheelListener, MouseListener, Ac
 		addMouseListener(this);
 		addMouseWheelListener(this);
 	}
+
+	public ArrayList<PointVisible> Jarvis (ArrayList<PointVisible> sommets) {
+		PointVisible PMin, PCourant, PSuivant = null;
+		PMin = getMin(sommets);
+		PCourant = PMin;
+		ArrayList<PointVisible> EnveConv = new ArrayList<PointVisible>();
+		EnveConv.add(PMin);
+
+
+		while (! PMin.equals(PSuivant)) {
+			PSuivant = getNext(PCourant, sommets);
+			if (PSuivant == null) {
+				System.out.println("PointsAlignÃ©s");
+				EnveConv.clear();
+				EnveConv.add(PMin);
+				break;
+			}
+			EnveConv.add(PSuivant);
+			PCourant = PSuivant;
+
+		}
+		return EnveConv;        
+	}
 	
-	// initialisation random
-	// NB: l'initialisation dans disque est à faire (exercice 1)
+	public PointVisible getMax(ArrayList<PointVisible> points) {
+		PointVisible PMax = points.get(0);
+		for (int i = 0; i < points.size(); ++i) {
+			if (PMax.getY() < points.get(i).getY()) PMax = points.get(i);
+			else if (PMax.getY() == points.get(i).getY())
+				if (PMax.getX() < points.get(i).getX()) PMax = points.get(i);
+		}
+		return PMax;
+	}
 	
-	public double det(CVector v1, CVector v2)
-	{
-		return v1.getX()*v2.getY()-v1.getY()*v2.getX();
+	/*
+	public ArrayList<PointVisible> triPolaire(ArrayList<PointVisible> sommets, PointVisible origine){
+		ArrayList<PointVisible> result = new ArrayList<PointVisible>();
+		
+		return result;
+	}
+	*/
+	
+	public ArrayList<PointVisible> Graham (ArrayList<PointVisible> sommets) {
+		ArrayList<PointVisible> EnveConv = new ArrayList<PointVisible>();
+		PointVisible PMax = getMax(sommets);
+		
+		
+		EnveConv.add(sommets.get(0));
+		EnveConv.add(sommets.get(1));
+		
+		for (int i = 2; i < sommets.size(); ++i) {
+			while (EnveConv.size() >= 2 && tour(EnveConv.get(EnveConv.size()-2), EnveConv.get(EnveConv.size() - 1), sommets.get(i)) < 0) {
+				EnveConv.remove(EnveConv.size() - 1);
+			}
+			EnveConv.add(sommets.get(i));
+		}
+		
+		
+		return EnveConv;
 	}
 
-	public double tour(CPoint p1, CPoint p2,CPoint p3)
-	{
-		CVector v1 = new CVector(p1,p2);
-		CVector v2 = new CVector(p1,p3);
-		
-		double d = det(v1,v2);
-		if (d>0)
-			return 1;
-		else if (d==0)
-			return 0;
-		else return 1;
-	}
-	
-	public void initPoints(int n, int r){
-			int xp,yp;
-			points = new ArrayList<PointVisible>();
-			for (int i = 0; i <n; i++){
-				xp = random(0, r);
-				yp = random(0, r);
-				points.add(new PointVisible(xp,  yp));
-				points.get(i).setLabel("Point "+i);
-			}
-	}
+	public PointVisible getNext(PointVisible PCourant, ArrayList<PointVisible> points) {
+		PointVisible PSuivant = points.get(0);
+		for (int i = 1; i < points.size(); ++i) {
+			if (!PCourant.equals(points.get(i))) {
 				
-	// méthode utilitaire 
+				if (tour(PCourant, PSuivant, points.get(i)) > 0) PSuivant = points.get(i);
+				else if (tour(PCourant, PSuivant, points.get(i)) == 0)return null;
+			}
+		}
+		return PSuivant;
+	}
+
+	public PointVisible getMin(ArrayList<PointVisible> points) {
+		PointVisible PMin = points.get(0);
+		for (int i = 0; i < points.size(); ++i) {
+			if (PMin.getY() > points.get(i).getY()) PMin = points.get(i);
+			else if (PMin.getY() == points.get(i).getY())
+				if (PMin.getX() > points.get(i).getX()) PMin = points.get(i);
+		}
+		return PMin;
+	}
+
+	public double determinant(PointVisible A, PointVisible B, PointVisible point) {
+		double deter1 = (B.getX() - A.getX()) * (point.getY() - A.getY());
+		double deter2 = (B.getY() - A.getY()) * (point.getX() - A.getX());
+		return deter1 - deter2;
+	}
+
+	public int tour (PointVisible A, PointVisible B, PointVisible point) {
+		double deter = determinant(A, B, point);
+		if (deter < 0)
+			return -1;
+		else if (deter > 0)
+			return 1;
+		else
+			return 0;
+	}
+
+    public ArrayList<PointVisible> getPoints(){
+        return this.points;
+    }
+
+    public double normePoints(PointVisible v1, PointVisible v2){
+        return Math.pow((v2.getX()-v1.getX()),2)+Math.pow((v2.getY()-v1.getY()),2);
+    }
+
+    public void initPoints(int n, int r){
+        int xp,yp;
+        points = new ArrayList<PointVisible>();
+        points.add(new PointVisible(centre,centre));
+        points.get(0).setLabel("Point 0");
+        while (points.size() < n){
+            xp = random(centre-r, centre+r);
+            yp = random(centre-r, centre+r);
+            PointVisible tmp = new PointVisible(xp,yp);
+            double norme = normePoints(points.get(0),tmp);
+            if (norme < Math.pow(r,2)){
+                points.add(new PointVisible(xp,yp));
+                points.get(points.size()-1).setLabel("Point "+ points.size());
+            }
+        }
+
+    }
+	
+	
+	// mï¿½thode utilitaire 
 	// retourne un entier compris entre xmin et xmax
 	int random(int xmin,int xmax){
 		double dr = Math.random() * (double) (xmax - xmin) + (double) xmin;
 		return (int) dr;
 	}
-		
+
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
@@ -93,10 +187,24 @@ public class Vue extends JPanel implements MouseWheelListener, MouseListener, Ac
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,	RenderingHints.VALUE_ANTIALIAS_ON);	
 
 		g2d.setColor(fgColor);
-		
+
 		for (PointVisible p: points) {
 			p.dessine(g2d);
 		}
+		
+		envellope = Jarvis(points);
+		
+		for (int i =0; i < envellope.size() - 1; i++){
+			Vecteur c = new Vecteur(envellope.get(i),envellope.get(i+1));
+			c.setLabel("");
+			c.dessine(g2d);	
+		}
+
+	}
+	
+	public void addPoint(int x, int y) {
+		points.add(new PointVisible(x, y));
+		points.get(points.size() - 1).setLabel("Point" + (points.size() - 1));
 	}
 
 	@Override
@@ -104,6 +212,10 @@ public class Vue extends JPanel implements MouseWheelListener, MouseListener, Ac
 		int n = points.size();
 		if (e.getButton() == MouseEvent.BUTTON1){
 			initPoints(n, 250);
+			repaint();
+		}
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			addPoint(e.getX(), e.getY());
 			repaint();
 		}
 	}
@@ -123,7 +235,7 @@ public class Vue extends JPanel implements MouseWheelListener, MouseListener, Ac
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
 	}
-	
+
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 	}
@@ -131,7 +243,7 @@ public class Vue extends JPanel implements MouseWheelListener, MouseListener, Ac
 	public void actionPerformed(ActionEvent e) {
 		String testFile = "tmp.txt";
 		ReadWritePoint rw = new ReadWritePoint(testFile);
-	
+
 		if(e.getActionCommand().equals("b1")){
 			for (PointVisible s: points){
 				rw.add(s.x+";" + s.y+";"+s.getLabel());
@@ -153,8 +265,7 @@ public class Vue extends JPanel implements MouseWheelListener, MouseListener, Ac
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-}
+	}
 
 }
-	
 
