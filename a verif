@@ -1,0 +1,71 @@
+#include "ImageBase.h"
+#include <stdio.h>
+#include <iostream>
+ 
+using namespace std;
+void calcDistance(int x, int y, unsigned char** tab, int sizeTab, int rayon) {
+    // int sizeMatrice = 4;
+    // int matrice[][4] = {
+    //     { 0, 5, -1, -1 },
+    //     { 5, 7, -1, 16 },
+    //     { -1, -1, -1, -1 },
+    //     { -1, 16, -1, -1 },
+    // };
+    // int matrice[][5] = {
+    //     { 0, 5, -1, -1, 8 },
+    //     { 5, 7, -1, -1, -1 },
+    //     { -1, -1, -1, 8, -1 },
+    //     { -1, -1, 8, -1, -1 },
+    //     { 8, -1, -1, -1, -1 },
+    // };
+    int matrice[][2] = {
+        { 0, 3},
+        { 3, 1},
+    };
+    int sizeMatrice = 2;
+    for (int i = 0; i < sizeMatrice; i ++) {
+        for (int j = 0; j < sizeMatrice; j++) {
+            if (matrice[i][j] == -1 || x+i >= sizeTab || y+j >= sizeTab || (i == 0 && j == 0)) continue;
+            unsigned char res = tab[x][y] + matrice[i][j];
+            if ((res < tab[x+i][y+j] || tab[x+i][y+j] == 0) && res <= rayon) {
+                tab[x+i][y+j] = res;
+                calcDistance(x+i, y+j, tab, sizeTab, rayon);
+            }
+        }
+    }
+}
+ 
+ 
+int main(int argc, char **argv)
+{
+    int size = 100;
+ 
+    unsigned char **distance;
+    distance = new unsigned char*[size];
+    for (int i = 0; i < size; i ++) {
+        distance[i] = new unsigned char [size];
+        for (int j = 0; j < size; j++) {
+            distance[i][j] = 0;
+        }
+    }
+    int rayon = 40;
+    calcDistance(0,0, distance, size, rayon);
+ 
+ 
+    ImageBase image = ImageBase(size*4,size*4, false);
+    for (int i = 0; i < size; i ++) {
+        for (int j = 0; j < size; j++) {
+            int indexUpLeft = image.getTotalSize() * 0.5 + size * 2 - i * size * 4 - j;
+            int indexUpRight = image.getTotalSize() * 0.5 + size * 2 - i * size * 4 + j;
+            int indexBottomLeft = image.getTotalSize() * 0.5 + size * 2 + i * size * 4 - j;
+            int indexBottomRight = image.getTotalSize() * 0.5 + size * 2 + i * size * 4 + j;
+            image.data[indexBottomRight] = distance[i][j] * 255 / rayon;
+            image.data[indexBottomLeft] = distance[i][j] * 255 / rayon;
+            image.data[indexUpLeft] = distance[i][j] * 255 / rayon;
+            image.data[indexUpRight] = distance[i][j] * 255 / rayon;
+        }
+    }
+    image.save("result.pgm");
+ 
+	return 0;
+}
