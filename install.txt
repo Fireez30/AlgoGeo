@@ -1,0 +1,42 @@
+The installation assumes your system meets some requirements.
+
+Save the archive ibex-2.6.0.tar.gz in some Ibex folder and:
+
+~/Ibex/$ tar xvfz ibex-2.6.0.tar.gz
+~/Ibex/$ cd ibex-2.6.0
+~/Ibex/ibex-2.6.0/$ ./waf configure
+~/Ibex/ibex-2.6.0/$ sudo ./waf install
+Windows
+Install MinGW+Msys.
+Select the following components to be installed:
+
+A MSYS Installation for MinGW Developers
+A Basic MinGW Installation
+The GNU C++ Compiler
+With recent releases of MinGW, you have to run the executable pi.bat in C:\MinGW\msys\1.0\postinstall
+
+Install Python2 (warning: the script are currently not compatible with python3)
+
+Create a new directory Ibex in the shell of MinGW (to open the shell of MinGW, click on Start -> MinGW -> MinGWShell):
+
+mkdir Ibex
+Note: if you don’t have MinGW in your Start menu, run the executable file msys.bat in C:\MinGW\msys\1.0.
+
+Assuming you have installed MinGW in C:\, the Ibex directory you have created should be located on your system here:
+
+C:\MinGW\msys\1.0\home\[user]\Ibex
+We will assume now that this folder is the root folder of ibex.
+
+Save the archive ibex-2.6.0.tar.gz in C:\MinGW\msys\1.0\home\[user]\Ibex
+
+Configure Ibex (still in the shell of MinGW):
+
+~/Ibex/$ export PATH="$PATH:/c/Python27"
+~/Ibex/$ tar xvfz ibex-2.6.0.tar.gz
+~/Ibex/$ cd ibex-2.6.0
+~/Ibex/ibex-2.6.0/$ ./waf configure --prefix=/c/MinGW/msys/1.0/home/[user]/Ibex/ibex-2.6.0
+Note: the paths must be entered in Linux-style (don’t use backslash (“\”) as separator).
+
+Install Ibex:
+
+~/Ibex/ibex-2.6.0/$ ./waf install
